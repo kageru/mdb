@@ -36,12 +36,14 @@ has_updates() {
 
 cd /home/nginx/html/blog
 if has_updates; then
-    git pull
-    rm index.html
+    git pull &> /dev/null
+    rm -f index.html
     output '<h1>Blog index</h1>'
     output '<table id="linklist">'
     ls -ltu src/*.md | tail -n+1 | while read f; do create_entry $f; done
     html_entry "legacy" "before 2020" "Older posts"
     output '</table>'
     output "<footer><a href=\"https://kageru.moe/contact/\">Contact</a><br/>generated on $(date '+%d.%m.%y at %H:%M:%S')</footer>"
+    # Human-readable output for the cron notification
+    echo "Updated blog to $(git shortlog | tail -n2 | head -n1)"
 fi
