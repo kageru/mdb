@@ -45,5 +45,6 @@ if has_updates; then
     output '</table>'
     output "<footer><a href=\"https://kageru.moe/contact/\">Contact</a><br/>generated on $(date '+%d.%m.%y at %H:%M:%S')</footer>"
     # Human-readable output for the cron notification
-    echo "Updated blog to $(git shortlog | tail -n2 | head -n1)"
+    echo 'Updated blog to:'
+    git log -1
 fi
