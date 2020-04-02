@@ -17,7 +17,7 @@ create_entry() {
     path="$9"
     outpath="content/$(basename "$path" .md).html"
     # convert new markdown posts to html
-    pandoc "$path" -t html -f gfm > "$outpath"
+    pandoc "$path" -t html -f markdown -o "$outpath"
     # then add it to the index
     title="$(rg 'h1' "$outpath" | head -n1 | rg -o '(?<=>).*(?=<)' --pcre2)"
     created=$(git log --follow --format=%as "$path" | tail -1)
