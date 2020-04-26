@@ -4,6 +4,16 @@ output() {
     echo "$1" >> index.html
 }
 
+add_header() {
+    output '<h1>Blog index</h1>'
+    output '<table id="linklist">'
+}
+
+add_footer() {
+    html_entry "legacy" "before 2020" "Older posts"
+    output '</table>'
+}
+
 html_entry() {
     output '<tr>'
     path="$1"
@@ -38,12 +48,9 @@ cd /home/nginx/html/blog
 if has_updates; then
     git pull &> /dev/null
     rm -f index.html
-    output '<h1>Blog index</h1>'
-    output '<table id="linklist">'
+    add_header
     ls -ltu src/*.md | tail -n+1 | while read f; do create_entry $f; done
-    html_entry "legacy" "before 2020" "Older posts"
-    output '</table>'
-    output "<footer><a href=\"https://kageru.moe/contact/\">Contact</a><br/>last updated on $(date '+%d.%m.%y at %H:%M:%S')</footer>"
+    add_footer
     # Human-readable output for the cron notification
     echo 'Updated blog to:'
     git log -1
