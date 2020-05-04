@@ -13,18 +13,17 @@ output_rss() {
 add_header() {
     output '<h1>Blog index</h1><table id="linklist">'
     output_rss '<?xml version="1.0" encoding="UTF-8" ?>
-<rss version="2.0">
-<channel>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+  <author><name>kageru</name></author>
   <title>kageru’s blog</title>'
-    output_rss "  <link>$blog_domain</link>
+    output_rss "  <link href=\"$blog_domain\" rel=\"self\" type=\"application/atom+xml\"/>
   <description>kageru’s blog</description>"
 }
 
 add_footer() {
     html_entry "legacy" "before 2020" "Older posts"
     output '</table>'
-    output_rss '</channel>
-</rss>'
+    output_rss '</feed>'
 }
 
 html_entry() {
@@ -37,11 +36,18 @@ html_entry() {
 }
 
 rss_entry() {
-    output_rss "  <item>
+    # The content is the output minus the first line
+    # (which would otherwise be a redundant title in most rss readers)
+    # and with escaped html.
+    # The sed expression is stolen from https://stackoverflow.com/questions/12873682/12873723#12873723
+    output_rss "  <entry>
     <title>$1</title>
     <link>$blog_domain$2</link>
-    <description>$1</description>
-  </item>"
+    <link href=\"$blog_domain$2\" type=\"text/html\" title=\"$1\"/>
+    <content type=\"html\" xml:base=\"$blog_domain$2\">
+      $(tail -n+2 "$2" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g; s/"/\&quot;/g; s/'"'"'/\&#39;/g')
+    </content>
+  </entry>"
 }
 
 create_entry() {
